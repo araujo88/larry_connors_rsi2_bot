@@ -1,21 +1,21 @@
 # Larry Connors RSI2
 
 import websocket, json, pprint, numpy
-import config
+import config # config file with Binance API keys
 from binance.client import Client
 from binance.enums import *
 import time
 import requests
 import win32api
 
-SOCKET = "wss://stream.binance.com:9443/ws/ethusdt@kline_15m"
-TAAPI_MA5 = "https://api.taapi.io/ma?secret=YOUR_SECRET_KEY&exchange=binance&symbol=ETH/USDT&interval=15m&optInTimePeriod=5"
-TAAPI_MA200 = "https://api.taapi.io/ma?secret=YOUR_SECRET_KEY&exchange=binance&symbol=ETH/USDT&interval=15m&optInTimePeriod=200"
-TAAPI_RSI = "https://api.taapi.io/rsi?secret=YOUR_SECRET_KEY&exchange=binance&symbol=ETH/USDT&interval=15m&optInTimePeriod=2"
+SOCKET = "wss://stream.binance.com:9443/ws/ethusdt@kline_15m" # Binance socket - 15 minute chart
+TAAPI_MA5 = "https://api.taapi.io/ma?secret=YOUR_SECRET_KEY&exchange=binance&symbol=ETH/USDT&interval=15m&optInTimePeriod=5" # Socket for 5-period moving average
+TAAPI_MA200 = "https://api.taapi.io/ma?secret=YOUR_SECRET_KEY&exchange=binance&symbol=ETH/USDT&interval=15m&optInTimePeriod=200" # Socket for 200-period moving average
+TAAPI_RSI = "https://api.taapi.io/rsi?secret=YOUR_SECRET_KEY&exchange=binance&symbol=ETH/USDT&interval=15m&optInTimePeriod=2" # Socket for RSI-2
 
-TRADE_SYMBOL = 'ETHUSDT'
+TRADE_SYMBOL = 'ETHUSDT' # Trading pair
 TRADE_QUANTITY = 0.01
-FEE = 0.001
+FEE = 0.001 # Binance fee
 in_position = False
 
 RSI_OVERSOLD = 5
@@ -23,6 +23,7 @@ RSI_OVERBOUGHT = 95
 
 client = Client(config.API_KEY, config.API_SECRET)
 
+# Synchronizes Windows clock with Binance
 gt = client.get_server_time()
 tt=time.gmtime(int((gt["serverTime"])/1000))
 win32api.SetSystemTime(tt[0],tt[1],0,tt[2],tt[3],tt[4],tt[5],0)
@@ -45,7 +46,7 @@ def on_close(ws):
 	print('closed connection')
 
 def on_message(ws, message):
-    global closes, highs, lows, in_position	
+    global in_position	
     #print('received message')	
     json_message = json.loads(message)
     #pprint.pprint(json_message)
@@ -78,7 +79,7 @@ def on_message(ws, message):
                 if in_position == True:
                     print("Sell trigger! Sell! Sell! Sell!")
 
-                    timestr = time.strftime("%Y/%m/%d-%H:%M:%S")
+                    timestr = time.strftime("%Y/%m/%d-%H:%M:%S") # Save to file
                     file = open('ETH_bot.txt', 'a')
                     file.write("Sell; " + format(close) + ";" + timestr + ";" + "\n")
                     file.close()
@@ -96,7 +97,7 @@ def on_message(ws, message):
                 else:
                     print("Buy trigger! Buy! Buy! Buy!")		
 
-                    timestr = time.strftime("%Y/%m/%d-%H:%M:%S")
+                    timestr = time.strftime("%Y/%m/%d-%H:%M:%S") # Save to file
                     file = open('ETH_bot.txt', 'a')
                     file.write("Buy; " + format(close) + ";" + timestr + ";" + "\n")
                     file.close()
@@ -110,7 +111,7 @@ def on_message(ws, message):
                 if in_position == True:
                     print("Sell trigger! Sell! Sell! Sell!")
     
-                    timestr = time.strftime("%Y/%m/%d-%H:%M:%S")
+                    timestr = time.strftime("%Y/%m/%d-%H:%M:%S") # Save to file
                     file = open('ETH_bot.txt', 'a')
                     file.write("Sell; " + format(close) + ";" + timestr + ";" + "\n")
                     file.close()
@@ -129,7 +130,7 @@ def on_message(ws, message):
                 else:
                     print("Buy trigger! Buy! Buy! Buy!")		
 
-                    timestr = time.strftime("%Y/%m/%d-%H:%M:%S")
+                    timestr = time.strftime("%Y/%m/%d-%H:%M:%S") # Save to file
                     file = open('ETH_bot.txt', 'a')
                     file.write("Buy; " + format(close) + ";" + timestr + ";" + "\n")
                     file.close()
