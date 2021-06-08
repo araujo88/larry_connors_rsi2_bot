@@ -1,4 +1,4 @@
-# Larry Connors RSI2
+# Larry Connors RSI2 for long positions
 
 import websocket, json, pprint, numpy
 import config # config file with Binance API keys
@@ -74,7 +74,7 @@ def on_message(ws, message):
         RSI = data3['value']
         print("RSI2: {}".format(RSI))
 
-        if close > float(MA200):
+        if close > float(MA200): # long trading
             if close > float(MA5):
                 if in_position == True:
                     print("Sell trigger! Sell! Sell! Sell!")
@@ -102,39 +102,6 @@ def on_message(ws, message):
                     file.write("Buy; " + format(close) + ";" + timestr + ";" + "\n")
                     file.close()
 
-                    #put binance buy order logic here
-                    order_succeeded = order(SIDE_BUY, TRADE_QUANTITY, TRADE_SYMBOL)
-                    if order_succeeded == True:
-                        in_position = True
-        else:
-            if float(RSI) > float(RSI_OVERBOUGHT):
-                if in_position == True:
-                    print("Sell trigger! Sell! Sell! Sell!")
-    
-                    timestr = time.strftime("%Y/%m/%d-%H:%M:%S") # Save to file
-                    file = open('ETH_bot.txt', 'a')
-                    file.write("Sell; " + format(close) + ";" + timestr + ";" + "\n")
-                    file.close()
-
-                    # put binance sell logic here
-                    order_succeeded = order(SIDE_SELL, TRADE_QUANTITY-FEE, TRADE_SYMBOL)
-                    if order_succeeded == True:
-                        in_position = False
-
-                else:
-                    print("Sell trigger, but you don't own any. Nothing to do.")
-    
-            if close < float(MA5):
-                if in_position == True:
-                    print("Buy trigger, but you already own it. Nothing to do")
-                else:
-                    print("Buy trigger! Buy! Buy! Buy!")		
-
-                    timestr = time.strftime("%Y/%m/%d-%H:%M:%S") # Save to file
-                    file = open('ETH_bot.txt', 'a')
-                    file.write("Buy; " + format(close) + ";" + timestr + ";" + "\n")
-                    file.close()
-    
                     #put binance buy order logic here
                     order_succeeded = order(SIDE_BUY, TRADE_QUANTITY, TRADE_SYMBOL)
                     if order_succeeded == True:
